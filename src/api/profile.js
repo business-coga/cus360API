@@ -7,8 +7,8 @@ const conn = require('../model/connect')
 Đáp ứng các yêu cầu sau:
 Giới hạn kết quả trả về :  
 limit 500, offset 1
-
 */
+
 user.get('/:id', (req,res,next)=>{
     conn.query(q.getProfileById(req.params.id))
     .then(({rows}) => {
@@ -99,7 +99,6 @@ user.get('/', (req,res,next)=>{
         offset : req.offset
     })
 })
-
 
 
 const q = {
