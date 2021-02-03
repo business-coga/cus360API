@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
@@ -19,6 +20,6 @@ app.use('/api',require('./src/middleware/auth') ,api)
 
 app.use('/', require('./src/api/auth'))
 
-app.listen(3000, ()=>{
-  console.log('Server on Port 3000')
+app.listen(process.env.PORT, ()=>{
+  console.log(`Server on http://127.0.0.1:${process.env.PORT}`)
 })
