@@ -24,19 +24,19 @@ user.get('/:id', (req,res,next)=>{
 },(req,res,next)=>{
     conn.query(q.getCustProfileSource(req.cust_profile_ids))
     .then(({rows})=>{
-        req.profile.cust_profile_source = rows.filter(x => x.cust_profile_id = req.profile.cust_profile_id)
+        req.profile.cust_profile_source = rows.filter(x => x.cust_profile_id == req.profile.cust_profile_id)
         next()
     })
 }, (req,res,next)=>{
     conn.query(q.getCustEmail(req.cust_profile_ids))
     .then(({rows})=>{
-        req.profile.cust_email = rows.filter(x => x.cust_profile_id = req.profile.cust_profile_id)
+        req.profile.cust_email = rows.filter(x => x.cust_profile_id == req.profile.cust_profile_id)
         next()
     })
 }, (req,res,next)=>{
     conn.query(q.getCustPhone(req.cust_profile_ids))
     .then(({rows})=>{
-        req.profile.cust_phone = rows.filter(x => x.cust_profile_id = req.profile.cust_profile_id)
+        req.profile.cust_phone = rows.filter(x => x.cust_profile_id == req.profile.cust_profile_id)
         next()
     })
 }, (req,res)=>{
@@ -71,7 +71,7 @@ user.get('/', (req,res,next)=>{
     conn.query(q.getCustProfileSource(req.cust_profile_ids))
     .then(({rows})=>{
         for(let i=0; i<req.profile.length; i++){
-            req.profile[i].cust_profile_source = rows.filter(x => x.cust_profile_id = req.profile[i].cust_profile_id)
+            req.profile[i].cust_profile_source = rows.filter(x => x.cust_profile_id == req.profile[i].cust_profile_id)
         }
         next()
     })
@@ -79,7 +79,7 @@ user.get('/', (req,res,next)=>{
     conn.query(q.getCustEmail(req.cust_profile_ids))
     .then(({rows})=>{
         for(let i=0; i<req.profile.length; i++){
-            req.profile[i].cust_email = rows.filter(x => x.cust_profile_id = req.profile[i].cust_profile_id)
+            req.profile[i].cust_email = rows.filter(x => x.cust_profile_id == req.profile[i].cust_profile_id)
         }
         next()
     })
@@ -87,7 +87,7 @@ user.get('/', (req,res,next)=>{
     conn.query(q.getCustPhone(req.cust_profile_ids))
     .then(({rows})=>{
         for(let i=0; i<req.profile.length; i++){
-            req.profile[i].cust_phone = rows.filter(x => x.cust_profile_id = req.profile[i].cust_profile_id)
+            req.profile[i].cust_phone = rows.filter(x => x.cust_profile_id == req.profile[i].cust_profile_id)
         }
         next()
     })
@@ -109,10 +109,17 @@ const q = {
         }
     },
     getProfile : function(limit = 25, offset = 0){
-        if( !(limit > 0) && !(limit < 500)){
-            limit=25
+        if(limit > 0 && limit < 500){
+        }else{
+            if(limit > 500){
+                limit = 500
+            }else{
+                limit = 25
+            }
         }
-        if(!(offset > 0)){
+        if(offset > 0){
+
+        }else{
             offset = 0
         }
         return {
@@ -131,14 +138,14 @@ const q = {
     },
     getCustPhone : function(cust_profile_ids){
         return {
-            text : `SELECT * 
+            text : `SELECT cust_phone_id, cust_profile_id, phone, phone_network, phone_type, status, description
             from consolidate.cust_phone
             WHERE cust_profile_id IN (${cust_profile_ids})`
         }
     },
     getCustEmail: function(cust_profile_ids){
         return {
-            text : `SELECT * 
+            text : `SELECT cust_email_id, cust_profile_id, email, email_type, status, purpose
             from consolidate.cust_email
             WHERE cust_profile_id IN (${cust_profile_ids})`
         }
