@@ -35,6 +35,7 @@ auth.post('/login',async (req,res,next)=>{
         if (err)
             return res.status(400).send('Mã hóa token không thành công')
         req.account.token = token
+        delete req.account.id
         delete req.account.password
         res.send(req.account)
     })
