@@ -44,10 +44,11 @@ user.get('/:id', (req,res,next)=>{
 })
 
 user.get('/', (req,res,next)=>{
-    let {limit,offset} = q.getProfile(req.query.limit, req.query.offset)
+    let {limit,offset,text} = q.getProfile(req.query.limit, req.query.offset, req.query.q)
+
     req.limit = parseInt(limit)
     req.offset = parseInt(offset)
-    conn.query(q.getProfile(req.query.limit, req.query.offset))
+    conn.query(q.getProfile(req.query.limit, req.query.offset, req.query.q))
     .then(({rows}) => {
         if(rows.length == 0){
             res.send({
@@ -108,7 +109,7 @@ const q = {
             values: [`${id}`],
         }
     },
-    getProfile : function(limit = 25, offset = 0){
+    getProfile : function(limit = 25, offset = 0, q = ''){
         if(limit > 0 && limit < 500){
         }else{
             if(limit > 500){
@@ -122,8 +123,12 @@ const q = {
         }else{
             offset = 0
         }
+
+        let condition = getCondition(q)
         return {
-            text : `SELECT * FROM consolidate.cust_profile LIMIT ${limit} OFFSET ${offset}`,
+            text : `SELECT * FROM consolidate.cust_profile 
+            ${condition != '' ? `WHERE ${condition}` : ''}
+            LIMIT ${limit} OFFSET ${offset}`,
             values : [],
             limit : limit,
             offset : offset
@@ -150,6 +155,22 @@ const q = {
             WHERE cust_profile_id IN (${cust_profile_ids})`
         }
     },
+}
+
+
+function getCondition(q = ''){
+    let result = ''
+    let conditions = q.split(';')
+    
+    if(q.length > 3){
+        conditions.forEach(e=>{
+            result = `${result} AND ${e}`
+        })
+        result = result.substring(5)
+        return result
+    }else{
+        return ''
+    }
 }
 
 module.exports = user
